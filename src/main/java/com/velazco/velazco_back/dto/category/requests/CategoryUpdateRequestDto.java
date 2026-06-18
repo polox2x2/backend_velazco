@@ -13,4 +13,6 @@ import lombok.NoArgsConstructor;
 public class CategoryUpdateRequestDto {
   @NotBlank
   private String name;
+  private String description;
 }
+

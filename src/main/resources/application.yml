@@ -1,0 +1,106 @@
+spring:
+  application:
+    name: velazco-backend
+  profiles:
+    active: local
+  sql:
+    init:
+      mode: never
+  jpa:
+    defer-datasource-initialization: true
+  config:
+    import: optional:file:.env[.properties]
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_USER}
+    password: ${EMAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+mercadopago:
+  access-token: ${MERCADOPAGO_ACCESS_TOKEN}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:5433/velazco-back
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+jwt:
+  secret: ${JWT_SECRET}
+app:
+  security:
+    jwt:
+      enabled: true
+base:
+  url: http://localhost:8080
+frontend:
+  url: http://localhost:5173
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    show-sql: true
+springdoc:
+  swagger-ui:
+    url: ${BASE_URL}/v3/api-docs
+jwt:
+  secret: ${JWT_SECRET}
+base:
+  url: ${BASE_URL}
+frontend:
+  url: ${FRONTEND_URL}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    show-sql: true
+jwt:
+  secret: ${JWT_SECRET}
+app:
+  security:
+    jwt:
+      enabled: true
+base:
+  url: ${BASE_URL}
+frontend:
+  url: ${FRONTEND_URL}

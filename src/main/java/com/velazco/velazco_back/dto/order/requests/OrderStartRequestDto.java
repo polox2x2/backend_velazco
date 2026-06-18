@@ -39,6 +39,9 @@ public class OrderStartRequestDto {
   @NotBlank(message = "El nombre del cliente es obligatorio.")
   private String clientName;
 
+  @jakarta.validation.constraints.Email(message = "El formato del correo electrónico no es válido.")
+  private String clientEmail;
+
   @NotNull(message = "La lista de detalles no puede ser nula.")
   @Size(min = 1, message = "Debe haber al menos un detalle en la orden.")
   @UniqueField(fieldName = "productId")

@@ -24,6 +24,9 @@ public class Category {
   @Column(name = "nombre", length = 100, nullable = false, unique = true)
   private String name; 
 
+  @Column(name = "descripcion", length = 255)
+  private String description;
+
   @OneToMany(mappedBy = "category")
   private List<Product> products;
 }

@@ -31,34 +31,34 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
       @Param("clientName") String clientName,
       Pageable pageable);
 
-  @Query("""
-          SELECT
-            DATE(o.date) AS saleDate,
-            p.name AS productName,
-            d.quantity AS quantity,
-            d.unitPrice AS unitPrice,
-            (d.quantity * d.unitPrice) AS subtotal,
-            o.id AS orderId
-          FROM Order o
-          JOIN o.details d
-          JOIN d.product p
-          WHERE o.status = :status
-      """)
+    @Query("""
+      SELECT
+        CAST(o.date AS date) AS saleDate,
+        p.name AS productName,
+        d.quantity AS quantity,
+        d.unitPrice AS unitPrice,
+        (d.quantity * d.unitPrice) AS subtotal,
+        o.id AS orderId
+      FROM Order o
+      JOIN o.details d
+      JOIN d.product p
+      WHERE o.status = :status
+  """)
   List<Object[]> findDetailedDeliveredSales(@Param("status") Order.OrderStatus status);
 
-  @Query("""
-          SELECT
-            DATE(o.date) AS deliveryDate,
-            o.id AS orderId,
-            p.name AS productName,
-            d.quantity AS quantity,
-            d.unitPrice AS unitPrice,
-            (d.quantity * d.unitPrice) AS subtotal
-          FROM Order o
-          JOIN o.details d
-          JOIN d.product p
-          WHERE o.status = :status
-      """)
+    @Query("""
+      SELECT
+        CAST(o.date AS date) AS deliveryDate,
+        o.id AS orderId,
+        p.name AS productName,
+        d.quantity AS quantity,
+        d.unitPrice AS unitPrice,
+        (d.quantity * d.unitPrice) AS subtotal
+      FROM Order o
+      JOIN o.details d
+      JOIN d.product p
+      WHERE o.status = :status
+  """)
   List<Object[]> findDeliveredOrderDetailsForWeek(@Param("status") Order.OrderStatus status);
 
   @Query("""

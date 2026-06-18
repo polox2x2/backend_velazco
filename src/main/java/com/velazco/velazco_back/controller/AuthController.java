@@ -55,7 +55,11 @@ public class AuthController {
     response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
     response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
-    return ResponseEntity.ok(Map.of("message", "Ingreso exitoso"));
+    java.util.Map<String, String> responseBody = new java.util.HashMap<>();
+    responseBody.put("message", "Ingreso exitoso");
+    responseBody.put("token", loginResponse.getAccessToken());
+
+    return ResponseEntity.ok(responseBody);
   }
 
   @PostMapping("/logout")

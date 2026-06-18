@@ -12,7 +12,11 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ProductUpdateActiveRequestDto {
 
-  @NotNull(message = "Active status must be provided")
-  private Boolean active;
+    @NotNull(message = "Active status must be provided")
+    private Boolean active;
 
+    // GETTER MANUAL - Agrega esto
+    public Boolean getActive() {
+        return this.active;
+    }
 }

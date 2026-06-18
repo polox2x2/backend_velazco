@@ -27,7 +27,7 @@ public interface OrderService {
 
     OrderConfirmSaleResponseDto confirmSale(Long orderId, User cashier, String paymentMethod);
 
-    void deleteCancelledOrdersOlderThanOneDay();
+    void cancelExpiredPendingOrders();
 
     OrderConfirmDispatchResponseDto confirmDispatch(Long orderId, User dispatchedBy);
 

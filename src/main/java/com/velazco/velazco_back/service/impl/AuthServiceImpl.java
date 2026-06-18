@@ -1,5 +1,7 @@
 package com.velazco.velazco_back.service.impl;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,8 +18,8 @@ import com.velazco.velazco_back.service.RefreshTokenService;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -30,24 +32,38 @@ public class AuthServiceImpl implements AuthService {
   @Override
   @Transactional
   public AuthLoginResponse login(AuthLoginRequestDto request, HttpServletRequest httpRequest) {
-    User user = userRepository.findByEmail(request.getEmail())
-        .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+    log.info("🟦 Intentando iniciar sesión con email: {}", request.getEmail());
 
-    if (!encoder.matches(request.getPassword(), user.getPassword())) {
+    User user = userRepository.findByEmail(request.getEmail())
+        .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con email: " + request.getEmail()));
+
+    log.info("✅ Usuario encontrado: {}", user.getEmail());
+
+    // Verificar si el usuario está activo
+    if (user.getActive() == null || !user.getActive()) {
+      log.warn("🚫 Usuario inactivo: {}", user.getEmail());
+      throw new GeneralBadRequestException("Usuario inactivo. Contacte al administrador.");
+    }
+
+    // Verificar contraseña
+    boolean passwordMatches = encoder.matches(request.getPassword(), user.getPassword());
+    if (!passwordMatches) {
+      log.warn("⚠️ Contraseña incorrecta para usuario: {}", user.getEmail());
       throw new GeneralBadRequestException("Contraseña incorrecta");
     }
 
-    if (!user.getActive()) {
-      throw new GeneralBadRequestException("Usuario inactivo");
-    }
+    log.info("🔐 Contraseña verificada correctamente.");
 
-    // Revocar todos los refresh tokens existentes del usuario para sesión única
+    // Revocar todos los refresh tokens anteriores del usuario
     refreshTokenService.revokeAllUserTokens(user);
+    log.info("♻️ Tokens antiguos del usuario revocados.");
 
-    // Generar nuevos tokens
+    // Generar tokens nuevos
     String accessToken = jwtTokenProvider.generateAccessToken(String.valueOf(user.getId()));
     String deviceInfo = getDeviceInfo(httpRequest);
     RefreshToken refreshToken = refreshTokenService.createRefreshToken(user, deviceInfo);
+
+    log.info("✅ Tokens generados correctamente para usuario {}", user.getEmail());
 
     return AuthLoginResponse.builder()
         .accessToken(accessToken)
@@ -60,6 +76,9 @@ public class AuthServiceImpl implements AuthService {
   public void logout(String refreshToken) {
     if (refreshToken != null && !refreshToken.isEmpty()) {
       refreshTokenService.revokeRefreshToken(refreshToken);
+      log.info("🚪 Refresh token revocado exitosamente.");
+    } else {
+      log.warn("⚠️ Intento de logout sin refresh token válido.");
     }
   }
 

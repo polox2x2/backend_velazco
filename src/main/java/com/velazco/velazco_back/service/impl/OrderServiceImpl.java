@@ -37,6 +37,7 @@ import com.velazco.velazco_back.repositories.OrderRepository;
 import com.velazco.velazco_back.repositories.ProductRepository;
 import com.velazco.velazco_back.repositories.SaleRepository;
 import com.velazco.velazco_back.service.OrderService;
+import com.velazco.velazco_back.service.EmailService;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -52,6 +53,7 @@ public class OrderServiceImpl implements OrderService {
   private final DispatchRepository dispatchRepository;
 
   private final OrderMapper orderMapper;
+  private final EmailService emailService;
 
   @Override
   public PaginatedResponseDto<OrderListResponseDto> getOrdersByStatus(Order.OrderStatus status, Pageable pageable) {
@@ -139,16 +141,21 @@ public class OrderServiceImpl implements OrderService {
 
     orderRepository.save(order);
 
+    // Enviar boleta de compra
+    emailService.sendPurchaseReceipt(order);
+
     return orderMapper.toConfirmSaleResponse(order);
   }
 
   @Override
   @Transactional
-  public void deleteCancelledOrdersOlderThanOneDay() {
-    LocalDateTime cutoffTime = LocalDateTime.now().minusDays(1);
-    List<Order> cancelledOrders = orderRepository.findByStatusAndDateBefore(Order.OrderStatus.CANCELADO, cutoffTime);
+  public void cancelExpiredPendingOrders() {
+    LocalDateTime cutoffTime = LocalDateTime.now().minusMinutes(30);
+    List<Order> pendingOrders = orderRepository.findByStatusAndDateBefore(Order.OrderStatus.PENDIENTE, cutoffTime);
 
-    orderRepository.deleteAll(cancelledOrders);
+    for (Order order : pendingOrders) {
+      cancelOrder(order.getId());
+    }
   }
 
   @Override
@@ -182,8 +189,20 @@ public class OrderServiceImpl implements OrderService {
     Order order = orderRepository.findById(orderId)
         .orElseThrow(() -> new EntityNotFoundException("Order not found with ID: " + orderId));
 
-    if (order.getStatus() != Order.OrderStatus.PENDIENTE) {
-      throw new IllegalStateException("El pedido no puede ser cancelado porque ya está " + order.getStatus());
+    if (order.getStatus() == Order.OrderStatus.CANCELADO) {
+      throw new IllegalStateException("El pedido ya está cancelado.");
+    }
+
+    // Si tiene venta asociada (PAGADO o ENTREGADO), la eliminamos
+    if (order.getSale() != null) {
+      saleRepository.delete(order.getSale());
+      order.setSale(null);
+    }
+    
+    // Si tiene despacho asociado (ENTREGADO), lo eliminamos
+    if (order.getDispatch() != null) {
+      dispatchRepository.delete(order.getDispatch());
+      order.setDispatch(null);
     }
 
     // Restaurar stock de cada producto del pedido

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import com.velazco.velazco_back.dto.product.requests.ProductCreateRequestDto;
 import com.velazco.velazco_back.dto.product.requests.ProductUpdateActiveRequestDto;
@@ -29,6 +30,7 @@ import com.velazco.velazco_back.service.ProductService;
 
 import jakarta.validation.Valid;
 
+@Tag(name = "Productos", description = "Gestión del catálogo de productos")
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {

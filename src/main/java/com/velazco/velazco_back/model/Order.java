@@ -34,12 +34,15 @@ public class Order {
   @Column(name = "nombre_cliente", length = 100, nullable = false)
   private String clientName;
 
+  @Column(name = "email_cliente", length = 150, nullable = true)
+  private String clientEmail;
+
   @Enumerated(EnumType.STRING)
   @Column(name = "estado", nullable = false, length = 20)
   private OrderStatus status;
 
   @ManyToOne
-  @JoinColumn(name = "usuario_atencion_id", nullable = false)
+  @JoinColumn(name = "usuario_atencion_id", nullable = true)
   private User attendedBy;
 
   @OneToOne(mappedBy = "order")
@@ -52,6 +55,6 @@ public class Order {
   private List<OrderDetail> details;
 
   public static enum OrderStatus {
-    PENDIENTE, PAGADO, CANCELADO, ENTREGADO
+    PENDIENTE, PAGADO, CANCELADO, ENTREGADO, PRUEBA_PENDIENTE, PRUEBA_APROBADO
   }
 }

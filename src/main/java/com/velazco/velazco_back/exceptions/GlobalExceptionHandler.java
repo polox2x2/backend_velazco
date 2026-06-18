@@ -55,6 +55,12 @@ public class GlobalExceptionHandler {
     return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST, request);
   }
 
+  @ExceptionHandler(IllegalStateException.class)
+  public ResponseEntity<ErrorResponse> handleIllegalState(IllegalStateException ex, WebRequest request) {
+    logger.warn("Illegal state: {}", ex.getMessage());
+    return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST, request);
+  }
+
   @ExceptionHandler(FileTooLargeException.class)
   public ResponseEntity<ErrorResponse> handleFileTooLargeException(FileTooLargeException ex, WebRequest request) {
     logger.warn("File too large: {}", ex.getMessage());

@@ -5,9 +5,11 @@ import java.time.LocalDate;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Pruebas", description = "Endpoints de prueba del sistema")
 @RestController
 @RequiredArgsConstructor
 public class TestController {

@@ -11,5 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class CategoryListResponseDto {
     private Long id;
-    private String name;
+  private String name;
+  private String description;
 }
+

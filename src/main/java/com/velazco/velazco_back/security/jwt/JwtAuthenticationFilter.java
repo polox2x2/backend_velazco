@@ -3,6 +3,7 @@ package com.velazco.velazco_back.security.jwt;
 import java.io.IOException;
 import java.time.Duration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -25,166 +26,155 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "app.security.jwt.enabled", havingValue = "true", matchIfMissing = true)
-@Slf4j
+@ConditionalOnProperty(name = "app.security.jwt.enabled", havingValue = "true", matchIfMissing = false)
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-  private final JwtTokenProvider jwtTokenProvider;
-  private final UserRepository userRepository;
-  private final RefreshTokenService refreshTokenService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
+    private final RefreshTokenService refreshTokenService;
 
-  @Override
-  protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
-      @NonNull FilterChain filterChain) throws ServletException, IOException {
+    @Value("${spring.profiles.active:dev}")
+    private String activeProfile;
 
-    String accessToken = getAccessTokenFromRequest(request);
-    String refreshToken = getRefreshTokenFromRequest(request);
+    @Override
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain)
+            throws ServletException, IOException {
 
-    if (StringUtils.hasText(accessToken) && jwtTokenProvider.validateToken(accessToken)) {
-      authenticateUser(accessToken);
-    }
+        String accessToken = getAccessTokenFromRequest(request);
+        String refreshToken = getRefreshTokenFromRequest(request);
 
-    else if (StringUtils.hasText(refreshToken)) {
-      try {
-        RefreshToken refreshTokenEntity = refreshTokenService.findByToken(refreshToken);
-        refreshTokenService.verifyExpiration(refreshTokenEntity);
-
-        User user = refreshTokenEntity.getUser();
-        if (user.getActive()) {
-          // Revocar el refresh token actual
-          refreshTokenService.revokeRefreshToken(refreshToken);
-
-          // Generar nuevos tokens
-          String newAccessToken = jwtTokenProvider.generateAccessToken(String.valueOf(user.getId()));
-          String deviceInfo = getDeviceInfo(request);
-          RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(user, deviceInfo);
-
-          // Configurar nuevas cookies
-          setTokenCookies(response, newAccessToken, newRefreshToken.getToken());
-
-          // Autenticar con el nuevo token
-          authenticateUser(newAccessToken);
-
-          log.debug("Access token renovado automáticamente para usuario: {}", user.getEmail());
+        if (StringUtils.hasText(accessToken) && jwtTokenProvider.validateToken(accessToken)) {
+            authenticateUser(accessToken);
         }
-      } catch (Exception e) {
-        log.debug("Error al renovar token automáticamente: {}", e.getMessage());
-        // Limpiar cookies inválidas
-        clearTokenCookies(response);
-      }
-    }
 
-    filterChain.doFilter(request, response);
-  }
+        else if (StringUtils.hasText(refreshToken)) {
+            try {
+                RefreshToken refreshTokenEntity = refreshTokenService.findByToken(refreshToken);
+                refreshTokenService.verifyExpiration(refreshTokenEntity);
 
-  private void authenticateUser(String accessToken) {
-    try {
-      Long userId = jwtTokenProvider.getUserIdFromToken(accessToken);
-      User user = userRepository.findById(userId)
-          .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+                User user = refreshTokenEntity.getUser();
+                if (user.getActive()) {
 
-      if (user.getActive()) {
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-            user, null, user.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-      }
-    } catch (Exception e) {
-      log.debug("Error al autenticar usuario: {}", e.getMessage());
-    }
-  }
+                    refreshTokenService.revokeRefreshToken(refreshToken);
 
-  private String getAccessTokenFromRequest(HttpServletRequest request) {
-    if (request.getCookies() != null) {
-      for (Cookie cookie : request.getCookies()) {
-        if ("velazco_token".equals(cookie.getName())) {
-          return cookie.getValue();
+                    String newAccessToken = jwtTokenProvider.generateAccessToken(String.valueOf(user.getId()));
+                    String deviceInfo = getDeviceInfo(request);
+                    RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(user, deviceInfo);
+
+                    setTokenCookies(response, newAccessToken, newRefreshToken.getToken());
+                    authenticateUser(newAccessToken);
+                }
+            } catch (Exception e) {
+                clearTokenCookies(response);
+            }
         }
-      }
+
+        filterChain.doFilter(request, response);
     }
 
-    String bearer = request.getHeader("Authorization");
-    if (StringUtils.hasText(bearer) && bearer.startsWith("Bearer ")) {
-      return bearer.substring(7);
+    private void authenticateUser(String accessToken) {
+        try {
+            Long userId = jwtTokenProvider.getUserIdFromToken(accessToken);
+            User user = userRepository.findById(userId)
+        .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+
+            if (user.getActive()) {
+                UsernamePasswordAuthenticationToken auth =
+                        new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            }
+        } catch (Exception ignored) {}
     }
 
-    return null;
-  }
-
-  private String getRefreshTokenFromRequest(HttpServletRequest request) {
-    if (request.getCookies() != null) {
-      for (Cookie cookie : request.getCookies()) {
-        if ("velazco_refresh_token".equals(cookie.getName())) {
-          return cookie.getValue();
+    private String getAccessTokenFromRequest(HttpServletRequest request) {
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("velazco_token".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
         }
-      }
-    }
-    return null;
-  }
-
-  private void setTokenCookies(HttpServletResponse response, String accessToken, String refreshToken) {
-    ResponseCookie accessTokenCookie = ResponseCookie.from("velazco_token", accessToken)
-        .httpOnly(true)
-        .secure(true)
-        .path("/")
-        .maxAge(Duration.ofHours(1))
-        .sameSite("Strict")
-        .build();
-
-    ResponseCookie refreshTokenCookie = ResponseCookie.from("velazco_refresh_token", refreshToken)
-        .httpOnly(true)
-        .secure(true)
-        .path("/")
-        .maxAge(Duration.ofDays(30))
-        .sameSite("Strict")
-        .build();
-
-    response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
-    response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
-  }
-
-  private void clearTokenCookies(HttpServletResponse response) {
-    ResponseCookie accessTokenCookie = ResponseCookie.from("velazco_token", "")
-        .httpOnly(true)
-        .secure(true)
-        .path("/")
-        .maxAge(Duration.ZERO)
-        .sameSite("Strict")
-        .build();
-
-    ResponseCookie refreshTokenCookie = ResponseCookie.from("velazco_refresh_token", "")
-        .httpOnly(true)
-        .secure(true)
-        .path("/")
-        .maxAge(Duration.ZERO)
-        .sameSite("Strict")
-        .build();
-
-    response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
-    response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
-  }
-
-  private String getDeviceInfo(HttpServletRequest request) {
-    String userAgent = request.getHeader("User-Agent");
-    String ipAddress = getClientIpAddress(request);
-    return String.format("IP: %s, UA: %s", ipAddress,
-        userAgent != null ? userAgent.substring(0, Math.min(userAgent.length(), 100)) : "Unknown");
-  }
-
-  private String getClientIpAddress(HttpServletRequest request) {
-    String xForwardedFor = request.getHeader("X-Forwarded-For");
-    if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
-      return xForwardedFor.split(",")[0].trim();
+        String bearer = request.getHeader("Authorization");
+        if (StringUtils.hasText(bearer) && bearer.startsWith("Bearer ")) {
+            return bearer.substring(7);
+        }
+        return null;
     }
 
-    String xRealIp = request.getHeader("X-Real-IP");
-    if (xRealIp != null && !xRealIp.isEmpty()) {
-      return xRealIp;
+    private String getRefreshTokenFromRequest(HttpServletRequest request) {
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("velazco_refresh_token".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
     }
 
-    return request.getRemoteAddr();
-  }
+    private void setTokenCookies(HttpServletResponse response, String accessToken, String refreshToken) {
+        boolean isProd = !"dev".equalsIgnoreCase(activeProfile);
+
+        ResponseCookie accessTokenCookie = ResponseCookie.from("velazco_token", accessToken)
+                .httpOnly(true)
+                .secure(isProd)
+                .path("/")
+                .maxAge(Duration.ofHours(1))
+                .sameSite(isProd ? "Strict" : "Lax")
+                .build();
+
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("velazco_refresh_token", refreshToken)
+                .httpOnly(true)
+                .secure(isProd)
+                .path("/")
+                .maxAge(Duration.ofDays(30))
+                .sameSite(isProd ? "Strict" : "Lax")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+    }
+
+    private void clearTokenCookies(HttpServletResponse response) {
+        boolean isProd = !"dev".equalsIgnoreCase(activeProfile);
+
+        ResponseCookie accessTokenCookie = ResponseCookie.from("velazco_token", "")
+                .httpOnly(true)
+                .secure(isProd)
+                .path("/")
+                .maxAge(Duration.ZERO)
+                .sameSite(isProd ? "Strict" : "Lax")
+                .build();
+
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("velazco_refresh_token", "")
+                .httpOnly(true)
+                .secure(isProd)
+                .path("/")
+                .maxAge(Duration.ZERO)
+                .sameSite(isProd ? "Strict" : "Lax")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+    }
+
+    private String getDeviceInfo(HttpServletRequest request) {
+        String ua = request.getHeader("User-Agent");
+        String ip = getClientIpAddress(request);
+        return "IP: " + ip + ", UA: " + (ua != null ? ua.substring(0, Math.min(ua.length(), 100)) : "Unknown");
+    }
+
+    private String getClientIpAddress(HttpServletRequest request) {
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip != null && !ip.isEmpty()) return ip.split(",")[0].trim();
+        ip = request.getHeader("X-Real-IP");
+        if (ip != null && !ip.isEmpty()) return ip;
+        return request.getRemoteAddr();
+    }
 }
