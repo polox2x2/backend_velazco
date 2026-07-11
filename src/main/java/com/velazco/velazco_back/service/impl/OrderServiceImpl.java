@@ -37,7 +37,6 @@ import com.velazco.velazco_back.repositories.OrderRepository;
 import com.velazco.velazco_back.repositories.ProductRepository;
 import com.velazco.velazco_back.repositories.SaleRepository;
 import com.velazco.velazco_back.service.OrderService;
-import com.velazco.velazco_back.service.EmailService;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -53,7 +52,6 @@ public class OrderServiceImpl implements OrderService {
   private final DispatchRepository dispatchRepository;
 
   private final OrderMapper orderMapper;
-  private final EmailService emailService;
 
   @Override
   public PaginatedResponseDto<OrderListResponseDto> getOrdersByStatus(Order.OrderStatus status, Pageable pageable) {
@@ -141,9 +139,9 @@ public class OrderServiceImpl implements OrderService {
 
     orderRepository.save(order);
 
-    // Enviar boleta de compra
-    emailService.sendPurchaseReceipt(order);
-
+    // Enviar boleta de compra (Removido para ventas en caja física según el requerimiento del usuario)
+    // Las ventas online lo enviarán desde PaymentService
+    
     return orderMapper.toConfirmSaleResponse(order);
   }
 

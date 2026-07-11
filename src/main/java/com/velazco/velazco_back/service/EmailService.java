@@ -15,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 
+import org.springframework.scheduling.annotation.Async;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -25,6 +27,7 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String adminEmail;
 
+    @Async
     public void sendContactEmail(String name, String email, String subject, String message) {
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -46,6 +49,7 @@ public class EmailService {
         }
     }
 
+    @Async
     public void sendPurchaseReceipt(Order order) {
         String recipient = order.getClientEmail();
         
