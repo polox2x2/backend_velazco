@@ -22,7 +22,12 @@ public class CorsConfig {
   CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration config = new CorsConfiguration();
 
-    config.setAllowedOriginPatterns(List.of("http://localhost:5173", frontendUrl, baseUrl));
+    config.setAllowedOriginPatterns(List.of(
+        "http://localhost:5173", 
+        "https://frontendvelazco-production.up.railway.app",
+        frontendUrl, 
+        baseUrl
+    ));
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
     config.setAllowedHeaders(List.of("*"));
     config.setAllowCredentials(true);
