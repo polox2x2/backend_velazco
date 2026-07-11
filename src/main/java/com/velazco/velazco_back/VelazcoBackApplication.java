@@ -6,9 +6,18 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.scheduling.annotation.EnableAsync;
 
+import java.util.TimeZone;
+import jakarta.annotation.PostConstruct;
+
 @SpringBootApplication
 @EnableAsync
 public class VelazcoBackApplication {
+
+	@PostConstruct
+	public void init() {
+		// Forzar a que todo el sistema backend use la hora de Perú (GMT-5)
+		TimeZone.setDefault(TimeZone.getTimeZone("America/Lima"));
+	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(VelazcoBackApplication.class, args);
