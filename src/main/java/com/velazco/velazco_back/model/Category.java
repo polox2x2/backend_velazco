@@ -10,7 +10,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(name = "categorias")
@@ -28,5 +30,7 @@ public class Category {
   private String description;
 
   @OneToMany(mappedBy = "category")
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
   private List<Product> products;
 }

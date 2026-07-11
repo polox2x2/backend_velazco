@@ -19,7 +19,9 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(name = "produccion", indexes = @Index(name = "idx_fecha_produccion", columnList = "fecha_produccion"))
@@ -52,6 +54,8 @@ public class Production {
 
   @OneToMany(mappedBy = "production", cascade = { CascadeType.PERSIST, CascadeType.MERGE,
       CascadeType.REMOVE }, orphanRemoval = true)
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
   private List<ProductionDetail> details;
 
   public static enum ProductionStatus {

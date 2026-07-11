@@ -48,9 +48,13 @@ public class Order {
   private User attendedBy;
 
   @OneToOne(mappedBy = "order")
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
   private Sale sale;
 
   @OneToOne(mappedBy = "order")
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
   private Dispatch dispatch;
 
   @OneToMany(mappedBy = "order", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
