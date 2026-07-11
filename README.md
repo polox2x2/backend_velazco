@@ -9,11 +9,13 @@ Para desplegar este backend en Railway y conectarlo a una base de datos PostgreS
 
 Se recomienda agregarlas usando la opción **Add Variable Reference** de Railway para que enlacen con tu servicio de base de datos (sustituye `Postgres` por el nombre exacto de tu servicio de base de datos en Railway):
 
-`SPRING_DATASOURCE_URL=jdbc:postgresql://${{Postgres.PGHOST}}:${{Postgres.PGPORT}}/${{Postgres.PGDATABASE}}`
+`DATABASE_URL=jdbc:postgresql://${{Postgres.PGHOST}}:${{Postgres.PGPORT}}/${{Postgres.PGDATABASE}}`
 
-`SPRING_DATASOURCE_USERNAME=${{Postgres.PGUSER}}`
+`POSTGRES_USER=${{Postgres.PGUSER}}`
 
-`SPRING_DATASOURCE_PASSWORD=${{Postgres.PGPASSWORD}}`
+`POSTGRES_PASSWORD=${{Postgres.PGPASSWORD}}`
+
+`PGDATABASE=${{Postgres.PGDATABASE}}`
 
 `SPRING_PROFILES_ACTIVE=prod`
 
