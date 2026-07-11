@@ -67,11 +67,9 @@ public class PaymentService {
         PreferenceClient client = new PreferenceClient();
         Preference preference = client.create(preferenceRequest);
 
-        boolean isTestEnv = "development".equalsIgnoreCase(appEnv) || "test".equalsIgnoreCase(appEnv);
-
         return PreferenceResponseDto.builder()
                 .preferenceId(preference.getId())
-                .initPoint(isTestEnv ? preference.getSandboxInitPoint() : preference.getInitPoint())
+                .initPoint(preference.getInitPoint())
                 .build();
     }
 
@@ -82,6 +80,10 @@ public class PaymentService {
     public void validatePayment(Long paymentId, Long orderId) throws Exception {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        if (order.getStatus() == Order.OrderStatus.PAGADO) {
+            return;
+        }
 
         com.mercadopago.client.payment.PaymentClient paymentClient = new com.mercadopago.client.payment.PaymentClient();
         com.mercadopago.resources.payment.Payment payment = paymentClient.get(paymentId);
@@ -115,7 +117,11 @@ public class PaymentService {
             order.setSale(sale);
 
             // Enviar boleta de compra
-            emailService.sendPurchaseReceipt(order);
+            try {
+                emailService.sendPurchaseReceipt(order);
+            } catch (Exception e) {
+                System.err.println("Error enviando boleta, pero el pago se registró: " + e.getMessage());
+            }
 
         } else if ("pending".equalsIgnoreCase(mpStatus) || "in_process".equalsIgnoreCase(mpStatus)) {
             order.setStatus(Order.OrderStatus.PENDIENTE);
