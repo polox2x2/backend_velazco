@@ -101,7 +101,7 @@ public class OrderController {
     return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
   }
 
-  @PreAuthorize("hasAnyRole('Administrador','Entregas')")
+  @PreAuthorize("hasAnyRole('Administrador','Entregas','Cajero','Vendedor')")
   @PostMapping("/{id}/confirm-dispatch")
   public ResponseEntity<OrderConfirmDispatchResponseDto> confirmDispatch(
       @PathVariable Long id,
