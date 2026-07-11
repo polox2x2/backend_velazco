@@ -41,8 +41,8 @@ spring:
       on-profile: prod
   datasource:
     url: ${DATABASE_URL}
-    username: ${POSTGRES_USER}
-    password: ${POSTGRES_PASSWORD}
+    username: ${POSTGRES_USER:${PGUSER}}
+    password: ${POSTGRES_PASSWORD:${PGPASSWORD}}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
