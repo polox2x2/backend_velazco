@@ -25,10 +25,16 @@ spring:
   ai:
     openai:
       api-key: ${OPENAI_API_KEY}
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
 mercadopago:
   access-token: ${MERCADOPAGO_ACCESS_TOKEN}
 jwt:
   secret: ${JWT_SECRET}
+storage:
+  upload-dir: ${RAILWAY_VOLUME_MOUNT_PATH:/app/uploads}
 app:
   security:
     jwt:

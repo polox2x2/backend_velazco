@@ -9,6 +9,16 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:your-local-google-client-id}
+            client-secret: ${GOOGLE_CLIENT_SECRET:your-local-google-client-secret}
+
+storage:
+  upload-dir: uploads
 
 base:
   url: http://localhost:8080
