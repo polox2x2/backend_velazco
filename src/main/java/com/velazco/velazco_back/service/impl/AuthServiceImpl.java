@@ -77,6 +77,7 @@ public class AuthServiceImpl implements AuthService {
             .nombreCompleto(user.getName())
             .email(user.getEmail())
             .telefono(user.getPhone())
+            .rol(user.getRole().getName())
             .build())
         .build();
   }
@@ -116,6 +117,7 @@ public class AuthServiceImpl implements AuthService {
             .nombreCompleto(savedUser.getName())
             .email(savedUser.getEmail())
             .telefono(savedUser.getPhone())
+            .rol(savedUser.getRole().getName())
             .build())
         .build();
   }

@@ -23,5 +23,6 @@ public class AuthLoginResponse {
       private String nombreCompleto;
       private String email;
       private String telefono;
+      private String rol;
   }
 }
