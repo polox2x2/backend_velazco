@@ -58,5 +58,29 @@ public class AdminDataInitializer implements CommandLineRunner {
             System.out.println("Password: admin1234");
             System.out.println("=======================================================================");
         }
+
+        // Initialize users for other roles
+        initializeUserIfNotFound("cajero@test.com", "Cajero Principal", "Cajero");
+        initializeUserIfNotFound("vendedor@test.com", "Vendedor Principal", "Vendedor");
+        initializeUserIfNotFound("produccion@test.com", "Encargado de Producción", "Producción");
+        initializeUserIfNotFound("entregas@test.com", "Repartidor Principal", "Entregas");
+        initializeUserIfNotFound("cliente@test.com", "Cliente Frecuente", "Cliente");
+    }
+
+    private void initializeUserIfNotFound(String email, String name, String roleName) {
+        if (userRepository.findByEmail(email).isEmpty()) {
+            Role role = roleRepository.findByName(roleName)
+                    .orElseThrow(() -> new RuntimeException("Error: Role " + roleName + " no encontrado"));
+
+            User user = new User();
+            user.setName(name);
+            user.setEmail(email);
+            user.setPassword(passwordEncoder.encode("admin1234")); // Contraseña por defecto
+            user.setActive(true);
+            user.setRole(role);
+
+            userRepository.save(user);
+            System.out.println("✅ Usuario " + roleName + " inicializado: " + email);
+        }
     }
 }
