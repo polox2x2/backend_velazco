@@ -17,7 +17,9 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(name = "pedidos")
@@ -52,6 +54,8 @@ public class Order {
   private Dispatch dispatch;
 
   @OneToMany(mappedBy = "order", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
   private List<OrderDetail> details;
 
   public static enum OrderStatus {

@@ -10,7 +10,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(name = "roles")
@@ -25,5 +27,7 @@ public class Role {
   private String name;
 
   @OneToMany(mappedBy = "role")
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
   private List<User> users;
 }

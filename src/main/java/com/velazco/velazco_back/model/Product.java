@@ -17,7 +17,9 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(name = "productos")
@@ -51,9 +53,13 @@ public class Product {
   private Category category;
 
   @OneToMany(mappedBy = "product")
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
   private List<OrderDetail> orderDetails;
 
   @OneToMany(mappedBy = "product")
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
   private List<ProductionDetail> productionDetails;
 
 }

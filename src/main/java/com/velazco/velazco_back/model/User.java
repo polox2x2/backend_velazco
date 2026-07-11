@@ -17,7 +17,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(name = "usuarios")
@@ -50,21 +52,33 @@ public class User implements UserDetails {
   private Role role;
 
   @OneToMany(mappedBy = "attendedBy")
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
   private List<Order> attendedOrders;
 
   @OneToMany(mappedBy = "cashier")
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
   private List<Sale> sales;
 
   @OneToMany(mappedBy = "dispatchedBy")
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
   private List<Dispatch> dispatches;
 
   @OneToMany(mappedBy = "assignedBy")
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
   private List<Production> assignedProductions;
 
   @OneToMany(mappedBy = "assignedTo")
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
   private List<Production> responsibleProductions;
 
   @OneToMany(mappedBy = "user")
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
   private List<RefreshToken> refreshTokens;
 
   @Override
