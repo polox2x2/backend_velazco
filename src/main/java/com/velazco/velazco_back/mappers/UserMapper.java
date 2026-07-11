@@ -33,6 +33,7 @@ public interface UserMapper {
   @Mapping(target = "authorities", ignore = true)
   @Mapping(target = "role.id", source = "roleId")
   @Mapping(target = "refreshTokens", ignore = true)
+  @Mapping(target = "phone", ignore = true)
   User toEntity(UserCreateRequestDto request);
 
   @Mapping(target = "id", ignore = true)
@@ -44,6 +45,7 @@ public interface UserMapper {
   @Mapping(target = "authorities", ignore = true)
   @Mapping(target = "role.id", source = "roleId")
   @Mapping(target = "refreshTokens", ignore = true)
+  @Mapping(target = "phone", ignore = true)
   User toEntity(UserUpdateRequestDto request);
 
   UserCreateResponseDto toUserCreateResponse(User user);

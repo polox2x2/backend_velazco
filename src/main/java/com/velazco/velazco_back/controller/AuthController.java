@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.velazco.velazco_back.dto.auth.request.AuthLoginRequestDto;
+import com.velazco.velazco_back.dto.auth.request.ClientRegisterRequestDto;
 import com.velazco.velazco_back.dto.auth.response.AuthLoginResponse;
 import com.velazco.velazco_back.service.AuthService;
 
@@ -31,7 +32,7 @@ public class AuthController {
 
   @Operation(summary = "Login endpoint", security = {})
   @PostMapping("/login")
-  public ResponseEntity<Map<String, String>> login(@Valid @RequestBody AuthLoginRequestDto request,
+  public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody AuthLoginRequestDto request,
       HttpServletRequest httpRequest, HttpServletResponse response) {
 
     AuthLoginResponse loginResponse = authService.login(request, httpRequest);
@@ -55,11 +56,46 @@ public class AuthController {
     response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
     response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
-    java.util.Map<String, String> responseBody = new java.util.HashMap<>();
+    java.util.Map<String, Object> responseBody = new java.util.HashMap<>();
     responseBody.put("message", "Ingreso exitoso");
     responseBody.put("token", loginResponse.getAccessToken());
+    responseBody.put("user", loginResponse.getUser());
 
     return ResponseEntity.ok(responseBody);
+  }
+
+  @Operation(summary = "Client register endpoint", security = {})
+  @PostMapping("/client/register")
+  public ResponseEntity<Map<String, Object>> registerClient(@Valid @RequestBody ClientRegisterRequestDto request,
+      HttpServletRequest httpRequest, HttpServletResponse response) {
+
+    AuthLoginResponse registerResponse = authService.registerClient(request, httpRequest);
+
+    ResponseCookie accessTokenCookie = ResponseCookie.from("velazco_token", registerResponse.getAccessToken())
+        .httpOnly(true)
+        .secure(true)
+        .path("/")
+        .maxAge(Duration.ofHours(1))
+        .sameSite("Strict")
+        .build();
+
+    ResponseCookie refreshTokenCookie = ResponseCookie.from("velazco_refresh_token", registerResponse.getRefreshToken())
+        .httpOnly(true)
+        .secure(true)
+        .path("/")
+        .maxAge(Duration.ofDays(30))
+        .sameSite("Strict")
+        .build();
+
+    response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
+    response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+
+    java.util.Map<String, Object> responseBody = new java.util.HashMap<>();
+    responseBody.put("message", "Registro exitoso");
+    responseBody.put("token", registerResponse.getAccessToken());
+    responseBody.put("user", registerResponse.getUser());
+
+    return ResponseEntity.status(org.springframework.http.HttpStatus.CREATED).body(responseBody);
   }
 
   @PostMapping("/logout")

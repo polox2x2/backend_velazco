@@ -14,6 +14,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
   @Query("SELECT p FROM Product p JOIN FETCH p.category c WHERE p.active = true AND p.stock > 0")
   List<Product> findAvailableProducts();
 
+  java.util.Optional<Product> findByNameIgnoreCase(String name);
+
   @Modifying
   @Query("UPDATE Product p SET p.stock = p.stock - :quantity WHERE p.id = :productId AND p.stock >= :quantity")
   int decrementStock(@Param("productId") Long productId, @Param("quantity") int quantity);

@@ -1,3 +1,5 @@
+server:
+  port: ${PORT:8080}
 spring:
   application:
     name: velazco-backend
@@ -21,9 +23,11 @@ spring:
           auth: true
           starttls:
             enable: true
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
 mercadopago:
   access-token: ${MERCADOPAGO_ACCESS_TOKEN}
-
 ---
 spring:
   config:
@@ -83,17 +87,17 @@ spring:
     activate:
       on-profile: prod
   datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}
+    username: ${PGUSER}
+    password: ${PGPASSWORD}
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:org.postgresql.Driver}
   jpa:
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
-    show-sql: true
+        dialect: ${SPRING_JPA_DATABASE_PLATFORM:org.hibernate.dialect.PostgreSQLDialect}
+    show-sql: false
 jwt:
   secret: ${JWT_SECRET}
 app:

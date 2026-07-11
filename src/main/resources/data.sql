@@ -4,6 +4,7 @@ INSERT INTO roles (id, nombre) VALUES (2, 'Cajero');
 INSERT INTO roles (id, nombre) VALUES (3, 'Vendedor');
 INSERT INTO roles (id, nombre) VALUES (4, 'Producción');
 INSERT INTO roles (id, nombre) VALUES (5, 'Entregas');
+INSERT INTO roles (id, nombre) VALUES (6, 'Cliente');
 
 -- Insertar usuarios - ACTUALIZADOS
 INSERT INTO usuarios (id, nombre, correo, password, activo, rol_id) VALUES (1, 'Admin Principal', 'admin@test.com', '$2a$10$0KGE33tFXl3AWBzNSfRdX.BRUlrNlBfc/Idl/Sa0a.p8Pakfp7WNa', true, 1);

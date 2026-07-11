@@ -12,4 +12,16 @@ import lombok.NoArgsConstructor;
 public class AuthLoginResponse {
   private String accessToken;
   private String refreshToken;
+  private UserDto user;
+
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @Builder
+  public static class UserDto {
+      private String id;
+      private String nombreCompleto;
+      private String email;
+      private String telefono;
+  }
 }

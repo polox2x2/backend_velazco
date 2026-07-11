@@ -2,7 +2,7 @@
 FROM eclipse-temurin:21-jdk AS builder
 WORKDIR /app
 COPY . .
-RUN chmod +x ./mvnw
+RUN sed -i 's/\r$//' mvnw && chmod +x ./mvnw
 RUN ./mvnw -B -DskipTests clean install
 
 # Etapa 2: Runtime

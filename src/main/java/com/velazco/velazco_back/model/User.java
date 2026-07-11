@@ -38,6 +38,9 @@ public class User implements UserDetails {
   @Column(name = "password", nullable = false, length = 255)
   private String password;
 
+  @Column(name = "telefono", length = 20)
+  private String phone;
+
   @Column(name = "activo", nullable = false)
   @ColumnDefault("true")
   private Boolean active;
