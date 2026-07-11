@@ -44,7 +44,7 @@ public class PaymentController {
             return ResponseEntity.ok("Payment validated");
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.internalServerError().body("Error validating payment: " + e.getMessage());
         }
     }
 }

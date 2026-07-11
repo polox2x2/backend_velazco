@@ -91,7 +91,7 @@ public class PaymentService {
         boolean isTest = "development".equalsIgnoreCase(appEnv) || "test".equalsIgnoreCase(appEnv);
         String mpStatus = payment.getStatus();
 
-        if ("approved".equalsIgnoreCase(mpStatus)) {
+        if ("approved".equalsIgnoreCase(mpStatus) || (isTest && "in_process".equalsIgnoreCase(mpStatus))) {
             // Set order to PAGADO instead of PRUEBA_APROBADO so it shows in Admin UI
             order.setStatus(Order.OrderStatus.PAGADO);
 
@@ -115,6 +115,7 @@ public class PaymentService {
 
             saleRepository.save(sale);
             order.setSale(sale);
+            orderRepository.save(order);
 
             // Enviar boleta de compra
             try {
@@ -123,8 +124,9 @@ public class PaymentService {
                 System.err.println("Error enviando boleta, pero el pago se registró: " + e.getMessage());
             }
 
-        } else if ("pending".equalsIgnoreCase(mpStatus) || "in_process".equalsIgnoreCase(mpStatus)) {
+        } else if ("pending".equalsIgnoreCase(mpStatus)) {
             order.setStatus(Order.OrderStatus.PENDIENTE);
+            orderRepository.save(order);
         }
     }
 }
