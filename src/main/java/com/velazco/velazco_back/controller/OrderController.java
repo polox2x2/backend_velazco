@@ -67,7 +67,7 @@ public class OrderController {
     return ResponseEntity.ok(orderService.getOrdersByStatus(orderStatus, pageable));
   }
 
-  @PreAuthorize("hasAnyRole('Administrador','Entregas')")
+  @PreAuthorize("hasAnyRole('Administrador','Entregas','Cajero','Vendedor')")
   @GetMapping("/delivered")
   public ResponseEntity<PaginatedResponseDto<DeliveredOrderResponseDto>> getDeliveredOrders(
       @RequestParam(defaultValue = "0") int page,
