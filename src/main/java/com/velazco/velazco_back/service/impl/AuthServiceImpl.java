@@ -36,12 +36,8 @@ public class AuthServiceImpl implements AuthService {
   @Override
   @Transactional
   public AuthLoginResponse login(AuthLoginRequestDto request, HttpServletRequest httpRequest) {
-    log.info("🟦 Intentando iniciar sesión con email: {}", request.getEmail());
-
     User user = userRepository.findByEmail(request.getEmail())
         .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con email: " + request.getEmail()));
-
-    log.info("✅ Usuario encontrado: {}", user.getEmail());
 
     // Verificar si el usuario está activo
     if (user.getActive() == null || !user.getActive()) {
@@ -56,18 +52,13 @@ public class AuthServiceImpl implements AuthService {
       throw new GeneralBadRequestException("Contraseña incorrecta");
     }
 
-    log.info("🔐 Contraseña verificada correctamente.");
-
     // Revocar todos los refresh tokens anteriores del usuario
     refreshTokenService.revokeAllUserTokens(user);
-    log.info("♻️ Tokens antiguos del usuario revocados.");
 
     // Generar tokens nuevos
     String accessToken = jwtTokenProvider.generateAccessToken(String.valueOf(user.getId()));
     String deviceInfo = getDeviceInfo(httpRequest);
     RefreshToken refreshToken = refreshTokenService.createRefreshToken(user, deviceInfo);
-
-    log.info("✅ Tokens generados correctamente para usuario {}", user.getEmail());
 
     return AuthLoginResponse.builder()
         .accessToken(accessToken)
@@ -85,8 +76,6 @@ public class AuthServiceImpl implements AuthService {
   @Override
   @Transactional
   public AuthLoginResponse registerClient(ClientRegisterRequestDto request, HttpServletRequest httpRequest) {
-    log.info("🟦 Intentando registrar cliente con email: {}", request.getEmail());
-
     if (userRepository.findByEmail(request.getEmail()).isPresent()) {
       throw new GeneralBadRequestException("El correo ya está registrado.");
     }
@@ -103,7 +92,6 @@ public class AuthServiceImpl implements AuthService {
     newUser.setRole(clientRole);
 
     User savedUser = userRepository.save(newUser);
-    log.info("✅ Cliente registrado exitosamente: {}", savedUser.getEmail());
 
     String accessToken = jwtTokenProvider.generateAccessToken(String.valueOf(savedUser.getId()));
     String deviceInfo = getDeviceInfo(httpRequest);
@@ -127,7 +115,6 @@ public class AuthServiceImpl implements AuthService {
   public void logout(String refreshToken) {
     if (refreshToken != null && !refreshToken.isEmpty()) {
       refreshTokenService.revokeRefreshToken(refreshToken);
-      log.info("🚪 Refresh token revocado exitosamente.");
     } else {
       log.warn("⚠️ Intento de logout sin refresh token válido.");
     }

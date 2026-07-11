@@ -41,7 +41,6 @@ public class EmailService {
             helper.setFrom(adminEmail);
 
             mailSender.send(mimeMessage);
-            log.info("Email de contacto enviado exitosamente.");
         } catch (MessagingException e) {
             log.error("Error al enviar email de contacto", e);
         }
@@ -91,7 +90,6 @@ public class EmailService {
             helper.setFrom(adminEmail);
 
             mailSender.send(mimeMessage);
-            log.info("Boleta de compra enviada exitosamente a {}", recipient);
         } catch (MessagingException e) {
             log.error("Error al enviar boleta de compra", e);
         }

@@ -17,8 +17,6 @@ public class OrderCleanupScheduler {
 
   @Scheduled(cron = "0 */5 * * * ?") // Cada 5 minutos
   public void cleanUpExpiredOrders() {
-    logger.info("🗑️ Ejecutando limpieza de órdenes PENDIENTES caducadas...");
     orderService.cancelExpiredPendingOrders();
-    logger.info("✅ Limpieza completada.");
   }
 }
