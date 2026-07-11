@@ -3,8 +3,10 @@ package com.velazco.velazco_back.config;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
@@ -123,9 +125,15 @@ public class MockDataInitializer implements CommandLineRunner {
             int numProducts = rand.nextInt(4) + 1; // 1 a 4 productos
             BigDecimal totalAmount = BigDecimal.ZERO;
             List<OrderDetail> details = new ArrayList<>();
+            Set<Long> usedProductIds = new HashSet<>();
 
             for (int p = 0; p < numProducts; p++) {
                 Product randomProd = allProducts.get(rand.nextInt(allProducts.size()));
+                if (usedProductIds.contains(randomProd.getId())) {
+                    continue;
+                }
+                usedProductIds.add(randomProd.getId());
+
                 int qty = rand.nextInt(3) + 1; // 1 a 3
                 BigDecimal subtotal = randomProd.getPrice().multiply(new BigDecimal(qty));
                 totalAmount = totalAmount.add(subtotal);
