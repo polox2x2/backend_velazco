@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class OrderCleanupScheduler {
 
-  private static final Logger logger = LoggerFactory.getLogger(OrderCleanupScheduler.class);
+
 
   private final OrderService orderService;
 

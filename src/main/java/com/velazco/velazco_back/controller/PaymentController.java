@@ -21,18 +21,10 @@ public class PaymentController {
             PreferenceResponseDto response = paymentService.createPreference(orderId);
             return ResponseEntity.ok(response);
         } catch (MPApiException e) {
-            System.err.println("=== MERCADO PAGO API ERROR ===");
-            System.err.println("Status Code: " + e.getStatusCode());
-            System.err.println("Response Content: " + e.getApiResponse().getContent());
-            e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         } catch (MPException e) {
-            System.err.println("=== MERCADO PAGO SDK ERROR ===");
-            System.err.println("Message: " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         } catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
     }
@@ -43,7 +35,6 @@ public class PaymentController {
             paymentService.validatePayment(paymentId, orderId);
             return ResponseEntity.ok("Payment validated");
         } catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.internalServerError().body("Error validating payment: " + e.getMessage());
         }
     }
