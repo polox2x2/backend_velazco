@@ -48,7 +48,7 @@ public class ProductController {
     return ResponseEntity.ok(productService.getAllProducts());
   }
 
-  @PreAuthorize("hasAnyRole('Administrador','Vendedor')")
+  @PreAuthorize("hasAnyRole('Administrador','Vendedor','Cajero')")
   @GetMapping("/available")
   public ResponseEntity<List<ProductListResponseDto>> getAllAvailableProducts() {
     List<ProductListResponseDto> products = productService.getAllAvailableProducts();
@@ -91,7 +91,7 @@ public class ProductController {
     return ResponseEntity.noContent().build();
   }
 
-  @PreAuthorize("hasRole('Administrador')")
+  @PreAuthorize("hasAnyRole('Administrador','Producción')")
   @GetMapping("/low-stock")
   public ResponseEntity<ProductLowStockResponseDto> getLowStockProducts() {
     return ResponseEntity.ok(productService.getLowStockProducts());

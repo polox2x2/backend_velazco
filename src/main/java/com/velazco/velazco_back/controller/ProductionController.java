@@ -56,7 +56,7 @@ public class ProductionController {
     return ResponseEntity.ok(response);
   }
 
-  @PreAuthorize("hasRole('Administrador')")
+  @PreAuthorize("hasAnyRole('Administrador','Vendedor')")
   @PostMapping
   public ResponseEntity<ProductionCreateResponseDto> createProduction(
       @AuthenticationPrincipal User user,

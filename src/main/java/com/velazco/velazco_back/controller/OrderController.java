@@ -48,7 +48,7 @@ public class OrderController {
     this.orderService = orderService;
   }
 
-  @PreAuthorize("hasAnyRole('Administrador','Cajero', 'Entregas')")
+  @PreAuthorize("hasAnyRole('Administrador','Cajero', 'Entregas', 'Vendedor')")
   @GetMapping("/status/{status}")
   public ResponseEntity<PaginatedResponseDto<OrderListResponseDto>> getOrdersByStatus(
       @PathVariable String status,
@@ -78,7 +78,7 @@ public class OrderController {
     return ResponseEntity.ok(orderService.getDeliveredOrders(pageable));
   }
 
-  @PreAuthorize("hasAnyRole('Administrador','Vendedor')")
+  @PreAuthorize("hasAnyRole('Administrador','Vendedor','Cajero')")
   @PostMapping("/start")
   public ResponseEntity<OrderStartResponseDto> startOrder(
       @AuthenticationPrincipal User user,
