@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:5433/velazco-back
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+base:
+  url: http://localhost:8080
+frontend:
+  url: http://localhost:5173
+
+# Esta configuración local solo se activa con SPRING_PROFILES_ACTIVE=local
