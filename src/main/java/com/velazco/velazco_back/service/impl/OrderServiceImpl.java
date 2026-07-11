@@ -54,6 +54,7 @@ public class OrderServiceImpl implements OrderService {
   private final OrderMapper orderMapper;
 
   @Override
+  @Transactional
   public PaginatedResponseDto<OrderListResponseDto> getOrdersByStatus(Order.OrderStatus status, Pageable pageable) {
     Page<Order> orderPage = orderRepository.findByStatus(status, pageable);
 
@@ -220,6 +221,7 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
+  @Transactional
   public PaginatedResponseDto<DeliveredOrderResponseDto> getDeliveredOrders(Pageable pageable) {
     Page<Order> orderPage = orderRepository.findByStatus(Order.OrderStatus.ENTREGADO, pageable);
 
