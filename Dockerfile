@@ -11,4 +11,4 @@ WORKDIR /app
 COPY --from=builder /app/target/velazco-back-0.0.1-SNAPSHOT.jar app.jar
 
 EXPOSE 8080
-CMD ["java", "-Xms128m", "-Xmx256m", "-XX:MaxMetaspaceSize=128m", "-Xss256k", "-XX:+UseSerialGC", "-jar", "app.jar"]
+CMD ["java", "-Djava.net.preferIPv4Stack=true", "-Xms128m", "-Xmx256m", "-XX:MaxMetaspaceSize=128m", "-Xss256k", "-XX:+UseSerialGC", "-jar", "app.jar"]
