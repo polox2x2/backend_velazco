@@ -97,9 +97,11 @@ public class EmailService {
             helper.setSubject("Boleta de Compra - Pedido #" + order.getId());
             helper.setFrom(adminEmail);
 
+            log.info("Enviando correo de boleta a: {}", recipient);
             mailSender.send(mimeMessage);
-        } catch (MessagingException e) {
-            log.error("Error al enviar boleta de compra", e);
+            log.info("Correo enviado exitosamente a: {}", recipient);
+        } catch (Exception e) {
+            log.error("Error al enviar boleta de compra a {}: {}", recipient, e.getMessage(), e);
         }
     }
 }
