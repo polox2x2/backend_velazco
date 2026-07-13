@@ -52,6 +52,7 @@ public class OrderServiceImpl implements OrderService {
   private final DispatchRepository dispatchRepository;
 
   private final OrderMapper orderMapper;
+  private final com.velazco.velazco_back.service.EmailService emailService;
 
   @Override
   @Transactional
@@ -140,8 +141,10 @@ public class OrderServiceImpl implements OrderService {
 
     orderRepository.save(order);
 
-    // Enviar boleta de compra (Removido para ventas en caja física según el requerimiento del usuario)
-    // Las ventas online lo enviarán desde PaymentService
+    // Enviar boleta de compra (solicitado por el usuario)
+    if (order.getClientEmail() != null && !order.getClientEmail().isEmpty()) {
+        emailService.sendPurchaseReceipt(order);
+    }
     
     return orderMapper.toConfirmSaleResponse(order);
   }

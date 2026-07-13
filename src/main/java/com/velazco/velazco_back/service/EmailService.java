@@ -62,10 +62,14 @@ public class EmailService {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
 
+            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+            String formattedDate = order.getDate() != null ? order.getDate().format(formatter) : java.time.LocalDateTime.now().format(formatter);
+
             StringBuilder htmlMsg = new StringBuilder();
             htmlMsg.append("<h2>¡Gracias por tu compra en Panadería Velazco!</h2>");
             htmlMsg.append("<p>Hola <strong>").append(order.getClientName()).append("</strong>,</p>");
             htmlMsg.append("<p>Tu pedido #").append(order.getId()).append(" ha sido pagado exitosamente y está siendo procesado.</p>");
+            htmlMsg.append("<p><strong>Fecha de compra:</strong> ").append(formattedDate).append("</p>");
             
             htmlMsg.append("<h3>Resumen de la Orden</h3>");
             htmlMsg.append("<table border='1' cellpadding='5' cellspacing='0' style='border-collapse: collapse;'>");
