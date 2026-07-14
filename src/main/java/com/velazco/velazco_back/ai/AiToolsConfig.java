@@ -74,7 +74,7 @@ public class AiToolsConfig {
   public record ObtenerHistorialVentasResponse(List<SaleInfo> sales) {}
 
   @Bean
-  @Description("Retorna la lista detallada de pedidos completados, incluyendo ID de pedido, cliente, fecha de orden, método de pago, repartidor y el total en Soles (S/.).")
+  @Description("Retorna la lista detallada de pedidos completados, no incluyendo ID de pedido creale un numero de orden secuencial, cliente, fecha de orden, método de pago, repartidor y el total en Soles (S/.).")
   public Function<ObtenerHistorialVentasRequest, ObtenerHistorialVentasResponse> obtenerHistorialVentas() {
     return request -> {
       // Obtenemos los ultimos 50 pedidos entregados
