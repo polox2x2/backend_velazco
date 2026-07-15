@@ -59,6 +59,7 @@ public class ProductionServiceImpl implements ProductionService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<ProductionProcessResponseDto> getProductionsInProcess() {
     List<Production> inProcess = productionRepository.findByStatus(ProductionStatus.EN_PROCESO);
     return inProcess.stream()
@@ -70,6 +71,7 @@ public class ProductionServiceImpl implements ProductionService {
         .toList();
   }
 
+  @Transactional(readOnly = true)
   public List<ProductionHistoryResponseDto> getCompletedAndIncompleteOrders() {
     List<Production.ProductionStatus> estados = List.of(
         Production.ProductionStatus.COMPLETO,
@@ -192,6 +194,7 @@ public class ProductionServiceImpl implements ProductionService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<ProductionDailyResponseDto> getDailyProductions() {
     List<Production> productions = productionRepository.findProductionsByProductionDate(LocalDate.now());
 
