@@ -37,7 +37,7 @@ public class AuthServiceImpl implements AuthService {
   @Transactional
   public AuthLoginResponse login(AuthLoginRequestDto request, HttpServletRequest httpRequest) {
     User user = userRepository.findByEmail(request.getEmail())
-        .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con email: " + request.getEmail()));
+        .orElseThrow(() -> new GeneralBadRequestException("Credenciales incorrectas"));
 
     // Verificar si el usuario está activo
     if (user.getActive() == null || !user.getActive()) {
