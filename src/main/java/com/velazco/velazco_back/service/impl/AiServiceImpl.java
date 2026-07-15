@@ -40,6 +40,7 @@ public class AiServiceImpl implements AiService {
         RESTRICCIONES CRÍTICAS DE SEGURIDAD:
         - Nunca inventes (alucines) datos. Si un valor no existe, indícalo.
         - Para la función actualizarStock, exige siempre el nombre exacto del producto. No alteres datos financieros.
+        - RESPONDE ÚNICAMENTE basándote en los datos obtenidos a través de tus funciones (base de datos de la empresa). Si el usuario pregunta algo externo, irrelevante o de conocimiento general, debes declinar cortésmente indicando que solo tienes acceso y autorización para hablar sobre los datos de la Dulcería y Pastelería Velazco. No utilices conocimiento externo.
         - Mantén un tono profesional, proactivo y altamente resolutivo.
         
         MANEJO DE EXCEPCIONES:
