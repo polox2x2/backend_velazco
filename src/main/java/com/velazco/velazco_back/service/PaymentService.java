@@ -27,7 +27,7 @@ public class PaymentService {
     private final com.velazco.velazco_back.repositories.UserRepository userRepository;
     private final EmailService emailService;
 
-    @Value("${frontend.url}")
+    @Value("${frontend.url:http://localhost:5173}")
     private String frontendUrl;
 
     @Transactional

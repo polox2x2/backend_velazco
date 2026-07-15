@@ -87,6 +87,7 @@ public class ProductionServiceImpl implements ProductionService {
   }
 
   @Override
+  @Transactional
   public ProductionCreateResponseDto createProduction(ProductionCreateRequestDto request, User assignedBy) {
     LocalDate requestedDate = request.getProductionDate();
     LocalDate today = LocalDate.now();
@@ -100,7 +101,9 @@ public class ProductionServiceImpl implements ProductionService {
       throw new IllegalArgumentException("Ya existe una orden de producción para la fecha seleccionada.");
     }
     Production production = productionMapper.toEntity(request);
-    production.setAssignedBy(assignedBy);
+    User persistentAssignedBy = userRepository.findById(assignedBy.getId())
+        .orElseThrow(() -> new EntityNotFoundException("User assignedBy not found"));
+    production.setAssignedBy(persistentAssignedBy);
 
     User assignedTo = userRepository.findById(production.getAssignedTo().getId())
         .orElseThrow(() -> new EntityNotFoundException("User to assign not found"));
@@ -131,6 +134,7 @@ public class ProductionServiceImpl implements ProductionService {
   }
 
   @Override
+  @Transactional
   public void deleteProductionById(Long productionId) {
     Production production = productionRepository.findById(productionId)
         .orElseThrow(() -> new EntityNotFoundException("Production not found"));
@@ -139,6 +143,7 @@ public class ProductionServiceImpl implements ProductionService {
   }
 
   @Override
+  @Transactional
   public ProductionUpdateResponseDto updateProduction(Long id, ProductionUpdateRequestDto dto, User updatedBy) {
     Production existing = productionRepository.findById(id)
         .orElseThrow(() -> new EntityNotFoundException("Production not found with ID: " + id));
