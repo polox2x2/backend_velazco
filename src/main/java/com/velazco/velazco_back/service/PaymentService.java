@@ -92,22 +92,22 @@ public class PaymentService {
         String mpStatus = payment.getStatus();
 
         if ("approved".equalsIgnoreCase(mpStatus) || (isTest && "in_process".equalsIgnoreCase(mpStatus))) {
-            // Set order to PAGADO instead of PRUEBA_APROBADO so it shows in Admin UI
+            // Marcar pedido como PAGADO
             order.setStatus(Order.OrderStatus.PAGADO);
 
-            // Calculate total amount for the Sale
+            // Calcular monto total
             java.math.BigDecimal totalAmount = order.getDetails().stream()
                     .map(detail -> detail.getUnitPrice().multiply(new java.math.BigDecimal(detail.getQuantity())))
                     .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
 
-            // Create a Sale record
+            // Crear registro de venta
             com.velazco.velazco_back.model.Sale sale = new com.velazco.velazco_back.model.Sale();
             sale.setSaleDate(java.time.LocalDateTime.now());
             sale.setPaymentMethod("Mercado Pago" + (isTest ? " (Prueba)" : ""));
             sale.setTotalAmount(totalAmount);
             sale.setOrder(order);
 
-            // Assign a default cashier since online sales don't have a specific human cashier
+            // Asignar cajero por defecto
             java.util.List<com.velazco.velazco_back.model.User> users = userRepository.findAll();
             if (!users.isEmpty()) {
                 sale.setCashier(users.get(0));

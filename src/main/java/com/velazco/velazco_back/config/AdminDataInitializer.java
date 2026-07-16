@@ -59,7 +59,7 @@ public class AdminDataInitializer implements CommandLineRunner {
             System.out.println("=======================================================================");
         }
 
-        // Initialize users for other roles
+        // Inicializar usuarios secundarios
         initializeUserIfNotFound("cajero@test.com", "Cajero Principal", "Cajero");
         initializeUserIfNotFound("vendedor@test.com", "Vendedor Principal", "Vendedor");
         initializeUserIfNotFound("produccion@test.com", "Encargado de Producción", "Producción");

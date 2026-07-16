@@ -39,7 +39,7 @@ public class EmailService {
                     + "<p>" + message.replace("\n", "<br>") + "</p>";
 
             helper.setText(htmlMsg, true);
-            helper.setTo(adminEmail); // Send to the admin
+            helper.setTo(adminEmail); // Enviar al administrador
             helper.setSubject("Nuevo Mensaje de Contacto Web: " + subject);
             helper.setFrom(adminEmail);
 
