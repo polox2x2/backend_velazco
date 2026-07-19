@@ -98,7 +98,7 @@ public class PaymentService {
             // Calcular monto total
             java.math.BigDecimal totalAmount = order.getDetails().stream()
                     .map(detail -> detail.getUnitPrice().multiply(new java.math.BigDecimal(detail.getQuantity())))
-                    .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+                    .reduce(java.math.BigDecimal.ZERO, (a, b) -> a.add(b));
 
             // Crear registro de venta
             com.velazco.velazco_back.model.Sale sale = new com.velazco.velazco_back.model.Sale();

@@ -97,11 +97,6 @@ public class ProductionServiceImpl implements ProductionService {
     if (requestedDate.isBefore(today)) {
       throw new IllegalArgumentException("No se puede crear una producción en una fecha pasada.");
     }
-
-    boolean existsOnSameDate = productionRepository.existsByProductionDate(requestedDate);
-    if (existsOnSameDate) {
-      throw new IllegalArgumentException("Ya existe una orden de producción para la fecha seleccionada.");
-    }
     Production production = productionMapper.toEntity(request);
     User persistentAssignedBy = userRepository.findById(assignedBy.getId())
         .orElseThrow(() -> new EntityNotFoundException("User assignedBy not found"));
